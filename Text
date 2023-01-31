@@ -1,0 +1,63 @@
+URL :
+-----
+http://localhost:8081/UPass/api/service/rest/utility/searchGroupOrChain?type=individual&searchText=t&city=&area=&limit=4&offset=0
+	
+Utility Service: 139
+---------------------
+
+public List<TempDetailsDTO> searchGroupOrChain(String type, String searchText, String city, String area, int offset,
+			int limit) throws IOException {s3.setRegion(usWest2);
+		List<TempDetailsDTO> details = new ArrayList<TempDetailsDTO>();
+		if (type.equalsIgnoreCase("chain")) {
+			details = utilityDAO.searchGroup(searchText, city, area, offset, limit);
+			for (TempDetailsDTO d : details) {
+				if (d.getCode() == 0) {
+					d.setStatus("ACTIVE");
+				} else if (d.getCode() == 1) {
+					d.setStatus("DEACTIVE");
+				} else if (d.getCode() == 2) {
+					d.setStatus("NEW");
+				} else if (d.getCode() == 3) {
+					d.setStatus("TBV");
+				} else if (d.getCode() == 4) {
+					d.setStatus("VIP");
+				} else if (d.getCode() == 5) {
+					d.setStatus("VC");
+				}
+				d.setType("chain");
+			}
+		} else if (type.equalsIgnoreCase("individual")) {
+			details = utilityDAO.searchVendor(searchText, city, area, offset, limit);
+			for (TempDetailsDTO d : details) {
+				if (d.getCode() == 0) {
+					d.setStatus("ACTIVE");
+				} else if (d.getCode() == 1) {
+					d.setStatus("DEACTIVE");
+				} else if (d.getCode() == 2) {
+					d.setStatus("NEW");
+				} else if (d.getCode() == 3) {
+					d.setStatus("TBV");
+				} else if (d.getCode() == 4) {
+					d.setStatus("VIP");
+				} else if (d.getCode() == 5) {
+					d.setStatus("VC");
+				}
+				d.setType("individual");
+			    d.setImage(getVendorImagesByVendorId(d.getVendorId()));
+			    d.getImage();
+				if (d.getId()!= null) {
+					Double rating = utilityDAO.getRating(d.getId());
+					d.setRating(rating);
+					List slot = vendorDAO.checkSlotAvailable(d.getId().longValue());
+					if (slot != null && !slot.isEmpty()) {
+						d.setSlotStatus(true);
+					} else {
+						d.setSlotStatus(false);
+					}
+				}
+			
+			  }
+
+		  }
+	 	  return details;
+	}
